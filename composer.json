@@ -11,7 +11,7 @@
             "Khoelck\\Phppowerbi\\": "src/"
         },
 		"files": [
-			"src/PowerBIReport.php",
+			"src/PowerBIReport.php"
 		]
     },
     "authors": [
