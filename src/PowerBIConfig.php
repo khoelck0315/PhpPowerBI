@@ -6,7 +6,7 @@ namespace Khoelck\PhpPowerBI {
          * Specify the relative location on the webserver of the powerbi.js file to the document root. 
          * https://github.com/microsoft/PowerBI-JavaScript
          */
-        public static string $PowerBI_JS = "/js/modules/powerbi.js";
+        public static string $PowerBI_JS = __DIR__."powerbi.js";
 
         /**
          * The root for calling the PowerBI API.  This should not need to change.
