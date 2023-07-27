@@ -13,6 +13,8 @@ The recommended way to install is via composer
 composer require khoelck/phppowerbi
 ```
 
+[PhpPowerBI on Packagist](https://packagist.org/packages/khoelck/phppowerbi)
+
 ### Manual install
 Copy the contents of the src folder to your include_path, and include the libraries in your authentication script as below:
 
@@ -33,6 +35,13 @@ Other options that can be changed in this file, depending on your scenario
 - Directory to look in for reportsettings.json files
 
 Each report you embed will need it's own JSON configuration file, based off of [these parameters](https://learn.microsoft.com/en-us/javascript/api/overview/powerbi/configure-report-settings) provided by Microsoft for calling the PowerBI API.  This should be placed in your include_path along with the PowerBIConfig.php file.  See EmbedExample.json for an example, but note, this will not be "well formed" JSON, as it is simply imported as a single string in the code for the API call.
+
+Because this project relies on the config file, be sure to also include it on any page PowerBIReport is used in addition to your composer autoload.
+
+```
+require "include_path/PowerBIConfig.php";
+```
+
 
 # Use Case
 You want to embed a PowerBI report in your PHP application - but you don't want to use the secure embed iframe option because it requires users to login.  It would be better to obtain an Azure Token at time of login, then call the PowerBI API to display the report.

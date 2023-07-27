@@ -1,11 +1,8 @@
 <?php declare(strict_types=1);
 namespace Khoelck\PhpPowerBI {
-    require "PowerBIConfig.php";
     require "AzureApiCall.php";
-    require PowerBIConfig::GetAzureAuthConfig();
     use stdClass;
-    use Khoelck\PhpAzureAuth\AzureConfig;
-    use Khoelck\PhpAzureAuth\AzureAuth;
+    
 
     /** 
      * To create an object from this class and embed a report, pass the following parameters.  These can be easily obtained from the

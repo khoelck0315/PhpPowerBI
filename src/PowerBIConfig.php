@@ -13,14 +13,7 @@ namespace Khoelck\PhpPowerBI {
          * https://learn.microsoft.com/en-us/rest/api/power-bi/
          */
         public static string $PowerBIApiRoot = "https://api.powerbi.com/v1.0/myorg/";
-
-        /**
-         * Specify the relative path to the AzureAuth.php file for use in refresh tokens
-         */
-        public static function GetAzureAuthConfig(): string {
-            return get_include_path() . "../../vendor/khoelck/phpazureauth/src/AzureAuth.php";
-        }
-		
+	
         /**
          * This loads the chunk of JSON as a string that will be loaded into the PowerBIReport/ShowReport method.  This specifies certain
          * settings for the report that can be customized.
