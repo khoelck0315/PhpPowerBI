@@ -1,0 +1,24 @@
+{
+    "name": "khoelck/phppowerbi",
+    "description": "A library for working with PowerBI embedded reports directly from PHP",
+    "type": "library",
+    "require": {
+        "khoelck/phpazureauth": "^1.2"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Khoelck\\Phppowerbi\\": "src/"
+        },
+		"files": [
+			"src/PowerBIReport.php",
+		]
+    },
+    "authors": [
+        {
+            "name": "Kevin Hoelck",
+            "email": "khoelck0315@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable"
+}

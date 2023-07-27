@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 namespace Khoelck\PhpPowerBI {
 
-    class PowerBIConfig {
+    final class PowerBIConfig {
         /**
          * Specify the relative location on the webserver of the powerbi.js file to the document root.  Make sure to copy this file from the PowerBI-JavaScript
          * repository dist folder.
@@ -26,7 +26,7 @@ namespace Khoelck\PhpPowerBI {
         /**
          * Specify the relative path to the AzureAuth.php file for use in refresh tokens
          */
-        public static string $AzureAuth = "classes\AzureAuth\AzureAuth.php";
+        public static string $AzureAuth = __DIR__."../PhpAzureAuth/AzureAuth.php";
 
 
         public static function GetReportSettings(string $settings): string {

@@ -1,0 +1,13 @@
+settings: {
+    bars: {
+        actionBar: {
+            visible: false
+        },
+        statusBar: {
+            visible: false
+        }
+    },
+    filterPaneEnabled: false,
+    navContentPaneEnabled: false,
+    zoomLevel: 1
+}
