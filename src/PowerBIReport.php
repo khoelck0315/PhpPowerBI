@@ -2,7 +2,7 @@
 namespace Khoelck\PhpPowerBI {
     require "PowerBIConfig.php";
     require "AzureApiCall.php";
-    require PowerBIConfig::$AzureAuth;
+    require PowerBIConfig::GetAzureAuthConfig();
     use stdClass;
     use Khoelck\PhpAzureAuth\AzureConfig;
     use Khoelck\PhpAzureAuth\AzureAuth;

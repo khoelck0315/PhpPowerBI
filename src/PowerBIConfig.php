@@ -3,8 +3,7 @@ namespace Khoelck\PhpPowerBI {
 
     final class PowerBIConfig {
         /**
-         * Specify the relative location on the webserver of the powerbi.js file to the document root.  Make sure to copy this file from the PowerBI-JavaScript
-         * repository dist folder.
+         * Specify the relative location on the webserver of the powerbi.js file to the document root. 
          * https://github.com/microsoft/PowerBI-JavaScript
          */
         public static string $PowerBI_JS = "/js/modules/powerbi.js";
@@ -16,19 +15,19 @@ namespace Khoelck\PhpPowerBI {
         public static string $PowerBIApiRoot = "https://api.powerbi.com/v1.0/myorg/";
 
         /**
+         * Specify the relative path to the AzureAuth.php file for use in refresh tokens
+         */
+        public static function GetAzureAuthConfig(): string {
+            return get_include_path() . "../../vendor/khoelck/phpazureauth/src/AzureAuth.php";
+        }
+		
+        /**
          * This loads the chunk of JSON as a string that will be loaded into the PowerBIReport/ShowReport method.  This specifies certain
          * settings for the report that can be customized.
          * This file should be placed in the same directory as this file.
          * More info https://learn.microsoft.com/en-us/javascript/api/overview/powerbi/configure-report-settings
          * @param string settings - specify the filename of the json file that should be used for the PowerBI report.
          */
-
-        /**
-         * Specify the relative path to the AzureAuth.php file for use in refresh tokens
-         */
-        public static string $AzureAuth = __DIR__."../PhpAzureAuth/AzureAuth.php";
-
-
         public static function GetReportSettings(string $settings): string {
             return file_get_contents(__DIR__."/$settings");
         }
