@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 namespace Khoelck\PhpPowerBI {
     require "AzureApiCall.php";
+    use Khoelck\PhpAzureAuth\AzureAuth;
     use stdClass;
-    
 
     /** 
      * To create an object from this class and embed a report, pass the following parameters.  These can be easily obtained from the
@@ -20,20 +20,25 @@ namespace Khoelck\PhpPowerBI {
         public function __construct(string $reportId, string $workspaceId, string $settings, stdClass $token) {
             $this->ReportID = $reportId;
             $this->WorkspaceID = $workspaceId;
-
-            //Next step is to parse this report data into private properties for this class instance to be referened when calling/displaying the report
-            $reportData = $this->GetReportData($token);
-            $this->DataContext = $reportData->{'@odata.context'};
-            $this->BaseRequestUrl = $this->GetBaseRequestUrl();
-            $this->ReportType = $reportData->reportType;
-            $this->Name = $reportData->name;
-            $this->WebUrl = $reportData->webUrl;
-            $this->EmbedUrl = $reportData->embedUrl;
-            $this->IsFromPbix = $reportData->isFromPbix;
-            $this->IsOwnedByMe = $reportData->isOwnedByMe;
-            $this->DatasetId = $reportData->datasetId;
-            $this->DatasetWorkspaceId = $reportData->datasetWorkspaceId;
-            $this->ReportSettings = PowerBIConfig::GetReportSettings($settings);
+        
+            if(!$this->ValidateToken()) {
+                $this->OutputErrorToConsole();
+            }
+            else {
+                //Next step is to parse this report data into private properties for this class instance to be referened when calling/displaying the report
+                $reportData = $this->GetReportData($token);
+                $this->DataContext = $reportData->{'@odata.context'};
+                $this->BaseRequestUrl = $this->GetBaseRequestUrl();
+                $this->ReportType = $reportData->reportType;
+                $this->Name = $reportData->name;
+                $this->WebUrl = $reportData->webUrl;
+                $this->EmbedUrl = $reportData->embedUrl;
+                $this->IsFromPbix = $reportData->isFromPbix;
+                $this->IsOwnedByMe = $reportData->isOwnedByMe;
+                $this->DatasetId = $reportData->datasetId;
+                $this->DatasetWorkspaceId = $reportData->datasetWorkspaceId;
+                $this->ReportSettings = PowerBIConfig::GetReportSettings($settings);
+            }    
         }
         
         /**
@@ -42,12 +47,26 @@ namespace Khoelck\PhpPowerBI {
          * @param string reportid - The HTML attribute ID of the parent element that will contain the report.
          */
         public function ShowReport(string $reportid): void {
-            if(!$this->ValidateToken()) {
-                $this->OutputErrorToConsole();
-            }
-            else {
-                $this->OutputReportJS($reportid);
-            }
+            echo "
+            <script>
+                (function() {
+                    const embedConfiguration = {
+                        type: 'report',
+                        accessToken: '".$_SESSION['AzureAuth']['Token']->access_token."',
+                        id: '". $this->ReportID."',
+                        embedUrl: '".$this->EmbedUrl."',".
+                        $this->ReportSettings.
+                    "};
+
+                    const reportContainerParentId = '".$reportid."';
+                    const reportContainerParent = document.getElementById(reportContainerParentId);
+                    const reportContainer = document.createElement('div');
+                    reportContainer.setAttribute('id', 'reportContainer');
+                    reportContainerParent.appendChild(reportContainer);
+                    const report = powerbi.embed(reportContainer, embedConfiguration);
+                })();
+            </script>
+            ";
         }
         
         protected function ValidateToken(): bool {
@@ -77,28 +96,6 @@ namespace Khoelck\PhpPowerBI {
 
         protected function BuildAuthHeader(): array {
             return array('Authorization: '. $_SESSION['AzureAuth']['Token']->token_type . ' ' . $_SESSION['AzureAuth']['Token']->access_token);
-        }
-
-        private function OutputReportJS(string $reportid): void {
-            echo "
-            <script src='".PowerBIConfig::$PowerBI_JS."'></script>
-            <script>
-                const embedConfiguration = {
-                    type: 'report',
-                    accessToken: '".$_SESSION['AzureAuth']['Token']->access_token."',
-                    id: '". $this->ReportID."',
-                    embedUrl: '".$this->EmbedUrl."',".
-                    $this->ReportSettings.
-                "};
-
-                const reportContainerParentId = '".$reportid."';
-                const reportContainerParent = document.getElementById(reportContainerParentId);
-                const reportContainer = document.createElement('div');
-                reportContainer.setAttribute('id', 'reportContainer');
-                reportContainerParent.appendChild(reportContainer);
-                const report = powerbi.embed(reportContainer, embedConfiguration);
-            </script>
-            ";
         }
 
         private function OutputErrorToConsole(): void {
