@@ -27,6 +27,7 @@ namespace Khoelck\PhpPowerBI {
             else {
                 //Next step is to parse this report data into private properties for this class instance to be referened when calling/displaying the report
                 $reportData = $this->GetReportData($token);
+
                 $this->DataContext = $reportData->{'@odata.context'};
                 $this->BaseRequestUrl = $this->GetBaseRequestUrl();
                 $this->ReportType = $reportData->reportType;
@@ -36,8 +37,8 @@ namespace Khoelck\PhpPowerBI {
                 $this->IsFromPbix = $reportData->isFromPbix;
                 $this->IsOwnedByMe = $reportData->isOwnedByMe;
                 $this->DatasetId = $reportData->datasetId;
-                $this->DatasetWorkspaceId = $reportData->datasetWorkspaceId;
-                $this->ReportSettings = PowerBIConfig::GetReportSettings($settings);
+                $this->DatasetWorkspaceID = $reportData->datasetWorkspaceId;
+                $this->ReportSettings = $this->GetReportSettings($settings);
             }    
         }
         
@@ -51,20 +52,37 @@ namespace Khoelck\PhpPowerBI {
             <script>
                 (function() {
                     const embedConfiguration = {
-                        type: 'report',
-                        accessToken: '".$_SESSION['AzureAuth']['Token']->access_token."',
-                        id: '". $this->ReportID."',
-                        embedUrl: '".$this->EmbedUrl."',".
+                        \"type\": 'report',
+                        \"accessToken\": '".$_SESSION['AzureAuth']['Token']->access_token."',
+                        \"id\": '". $this->ReportID."',
+                        \"embedUrl\": '".$this->EmbedUrl."',".
                         $this->ReportSettings.
                     "};
-
-                    const reportContainerParentId = '".$reportid."';
-                    const reportContainerParent = document.getElementById(reportContainerParentId);
-                    const reportContainer = document.createElement('div');
-                    reportContainer.setAttribute('id', 'reportContainer');
-                    reportContainerParent.appendChild(reportContainer);
+                    
+                    const reportContainer = document.getElementById('".$reportid."');
                     const report = powerbi.embed(reportContainer, embedConfiguration);
                 })();
+            </script>
+            ";
+        }
+
+        /**
+         * Instead of appending the report to the document with this call, simply output the report configuration including the access
+         * token.  This option can be used if custom JavaScript is going to be used to append the reports intead, but makes the needed information
+         * available to your custom function.
+         * @param string reportid - A unique name for the config that will be referenced by your custom function.
+         */
+        public function ShowConfig(string $reportid): void {
+            echo "
+            <script>
+                
+                const ".$reportid."Config = {
+                        \"type\": 'report',
+                        \"accessToken\": '".$_SESSION['AzureAuth']['Token']->access_token."',
+                        \"id\": '". $this->ReportID."',
+                        \"embedUrl\": '".$this->EmbedUrl."',".
+                        $this->ReportSettings.
+                    "};    
             </script>
             ";
         }
@@ -119,12 +137,16 @@ namespace Khoelck\PhpPowerBI {
         }
 
         private function GetSingleReportUrl(): string {
-            return PowerBIConfig::$PowerBIApiRoot.'groups/'.$this->WorkspaceID.'/'.'reports/'.$this->ReportID;
+            return self::$PowerBIApiRoot.'groups/'.$this->WorkspaceID.'/'.'reports/'.$this->ReportID;
         }
 
-
+        private function GetReportSettings(string $settings): string {
+            $json = file_get_contents(get_include_path()."/$settings");
+            return trim($json, "{}");
+        }
 
         public string $DataContext;
+        public string $BaseRequestUrl;
         public string $ReportID;
         public string $ReportType;
         public string $Name;
@@ -136,6 +158,8 @@ namespace Khoelck\PhpPowerBI {
         public string $DatasetWorkspaceID;
         public string $WorkspaceID;
         public stdClass $Token;
+        public string $ReportSettings;
+        public static string $PowerBIApiRoot = "https://api.powerbi.com/v1.0/myorg/";
     }
 
 }
