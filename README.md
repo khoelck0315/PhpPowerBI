@@ -24,19 +24,9 @@ use Khoelck\PhpPowerBI\PowerBIReport;
 ```
 
 # Initial Configuration
-Before using this in your code, navigate to the install folder (vendor/khoelck/phppowerbi/src for composer installs) and copy the PowerBIConfig.php file to your include_path.
+Each report you embed will need it's own JSON configuration file, based off of [these parameters](https://learn.microsoft.com/en-us/javascript/api/overview/powerbi/configure-report-settings) provided by Microsoft for calling the PowerBI API.  This should be placed in your include_path along with the PowerBIConfig.php file.  See EmbedExample.json for an example.
 
-The most important option that can be configured here is the directory location of the reportsettings.json files.  The PowerBI root API URL will most likely not need to be changed.
-
-Each report you embed will need it's own JSON configuration file, based off of [these parameters](https://learn.microsoft.com/en-us/javascript/api/overview/powerbi/configure-report-settings) provided by Microsoft for calling the PowerBI API.  This should be placed in your include_path along with the PowerBIConfig.php file.  See EmbedExample.json for an example, but note, this will not be "well formed" JSON, as it is simply imported as a single string in the code for the API call.
-
-Because this project relies on the config file, be sure to also include it on any page PowerBIReport is used in addition to your composer autoload.
-
-```
-require "include_path/PowerBIConfig.php";
-```
-
-Be also sure to include the *powerbi.js* or *powerbi.min.js* file in your page:
+Be sure to include the *powerbi.js* or *powerbi.min.js* file in your page, before you call any methods from PHPPowerBI of course:
 ```
 <script src="path/to/powerbi.js"></script>
 ```
@@ -46,7 +36,58 @@ You want to embed a PowerBI report in your PHP application - but you don't want 
 
 Leverage the AzureAuth API in your authentication script, which stores the token in your $_SESSION variable.  Then, when calling the PowerBIRepot constructor, pass in the $_SESSION['Token'] variable to access and embed your report on the page.
 
-See Example.php for proper usage.
+# Embedding Reports
+The constructor for PowerBIReport takes 4 parameters:
+- Your Report ID GUID
+- Your Workspace ID GUID
+- The name of the JSON file containing settings that will be used to render the report
+- The Azure token to be passed when accessing the report
+
+```
+<?php
+use Khoelck\PhpPowerBI\PowerBIReport;
+
+// Create a report, assuming you've already obtained a token and added it to your session variable
+$report = new PowerBIReport("eb85896e-f6ce-4303-b357-b3d6e7232ca9", "9467ec51-dcab-40ef-b2c3-7a4f41f835a8", "ModalEmbed.json", $_SESSION['AzureAuth']['Token']);
+?>
+```
+
+Now, you can call one of two methods to embed the report:
+
+1. ShowReport - this will take one argument which is the element ID you wish to append the report to, and will render it automatically.
+```
+<div id="embeddedReport"></div>
+
+<?php
+  $report->ShowReport("embeddedReport");
+?>
+```
+
+2. ShowConfig - this will simply create a global constant with your report configuration that contains all of the necessary information to pass directly to the powerbi.embed function.  The word Config will be appended to whatever you pass into this method for an parameter.  You may want to use this if you intend to call powerbi.bootstrap on something first.  For example, if you wanted to embed multiple reports in a modal or slideshow component, you could call powerbi.bootstrap on those elements, then call powerbi.embed when the reports should be shown.  This can add better loading times to your embedded reports.  Below is a very basic example:
+   
+```
+<?php
+  $report->ShowConfig("embeddedReport");
+?>
+
+<div id="embeddedReport"></div>
+<button type="button" id="show">Show Report</button>
+
+<script>
+  powerbi.bootstrap(
+    document.getElementbyId("embeddedReport"),
+    {
+      type: 'report',
+      embedUrl: embeddedReportConfig.embedUrl
+    }
+  );
+
+  const btn = document.getElementById('show');
+  btn.addEventListener('click', function() {
+    powerbi.embed(document.getElementById('embeddedReport'), embeddedReportConfig);
+  });
+</script>
+```
 
 # Report Styling
 You will need to add CSS for the report container, however there are additional options that should be configured in the JSON file.  Many of the report options can be configured in the JSON configuration file for the report.
