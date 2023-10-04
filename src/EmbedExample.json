@@ -1,13 +1,14 @@
-settings: {
-    bars: {
-        actionBar: {
-            visible: false
+{
+    "settings": {
+        "bars": {
+            "actionBar": {
+                "visible": false
+            },
+            "statusBar": {
+                "visible": false
+            }
         },
-        statusBar: {
-            visible: false
-        }
-    },
-    filterPaneEnabled: false,
-    navContentPaneEnabled: false,
-    zoomLevel: 1
+        "filterPaneEnabled": false,
+        "navContentPaneEnabled": false
+    }   
 }
